@@ -1,0 +1,30 @@
+name: gym-app
+
+services:
+  local_mongo_lab:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    env_file:
+      - .env
+    volumes:
+      - mongo-db-data:/data/db
+    networks:
+      - appnet
+  mongo-express:
+    image: mongo-express:latest
+    container_name: gym-mongo-express
+    restart: unless-stopped
+    ports:
+      - "8082:8081"
+    env_file:
+      - .env
+    depends_on:
+      - local_mongo_lab
+    networks:
+      - appnet
+volumes:
+  mongo-db-data:
+networks:
+  appnet:
+    driver: bridge
