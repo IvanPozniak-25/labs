@@ -1,0 +1,18 @@
+name: school-kindergarden-app
+
+services:
+  local_mysql_lab:
+    image: mysql:latest
+    ports:
+      - "3306:3306"
+    env_file:
+      - .env
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - appnet
+volumes:
+  db-data:
+networks:
+  appnet:
+    driver: bridge
