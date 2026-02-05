@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis-stateful-set
+  
+  labels:
+    app: redis-lab
+    environment: dev
+spec:
+    serviceName: "redis-lab"
+    selector:
+      matchLabels:
+        app: redis-lab
+    replicas: 2
+    template:
+      metadata:
+        labels:
+          app: redis-lab
+          environment: dev
+        name: redis-lab
+      spec:
+        containers:
+          - name: redis-lab-pod
+            image: redis:8.0.2
+            ports:
+              - containerPort: 6379
+            resources:
+              limits:
+                cpu: "0.1"
+            volumeMounts:
+              - name: redis-lab-pvc
+                mountPath: /redis-lab-pvc
+    volumeClaimTemplates:
+      - metadata:
+          name: redis-lab-pvc
+        spec:
+          accessModes: ["ReadWriteOnce"]
+          storageClassName: "standard"
+          resources:
+            requests:
+              storage: 1Gi
+
+

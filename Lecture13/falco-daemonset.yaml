@@ -1,0 +1,116 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: falco-lab
+  namespace: kube-system
+  labels:
+    app: falco-lab
+spec:
+  selector:
+    matchLabels:
+      app: falco-lab
+  template:
+    metadata:
+      labels:
+        app: falco-lab
+    spec:
+      hostPID: true
+      tolerations:
+        - key: "node-role.kubernetes.io/control-plane"
+          operator: "Exists"
+          effect: "NoSchedule"
+      containers:
+        - name: falco-lab-container
+          image: docker.io/falcosecurity/falco:0.43.0
+          securityContext:
+            privileged: true
+          resources:
+            limits:
+              cpu: 100m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          volumeMounts:
+              - name: proc
+                mountPath: /host/proc
+                readOnly: true
+              - name: boot
+                mountPath: /host/boot
+                readOnly: true
+              - name: libmodules
+                mountPath: /host/lib/modules
+                readOnly: true
+              - name: docker-sock
+                mountPath: /var/run/docker.sock
+              - name: usr
+                mountPath: /host/usr
+                readOnly: true
+              - name: sys
+                mountPath: /host/sys
+                readOnly: true
+              - name: sys-fs
+                mountPath: /sys/kernel/debug
+                readOnly: true
+              - name: sys-trs
+                mountPath: /sys/kernel/tracing
+                readOnly: true
+              - name: sys-btf
+                mountPath: /sys/kernel/btf
+                readOnly: true
+              - name: dev-fs
+                mountPath: /host/dev
+                readOnly: true
+              - name: etc-fs
+                mountPath: /host/etc
+                readOnly: true
+
+      volumes:
+        - name: proc
+          hostPath:
+            path: /proc
+            type: Directory
+        - name: boot
+          hostPath:
+            path: /boot
+            type: DirectoryOrCreate
+        - name: libmodules
+          hostPath:
+            path: /lib/modules
+            type: Directory
+        - name: docker-sock
+          hostPath:
+            path: /var/run/docker.sock
+            type: Socket
+        - name: usr
+          hostPath:
+            path: /usr
+            type: Directory
+        - name: sys
+          hostPath:
+            path: /sys
+            type: Directory
+        - name: sys-fs
+          hostPath:
+            path: /sys/kernel/debug
+        - name: sys-trs
+          hostPath:
+            path: /sys/kernel/tracing
+        - name: sys-btf
+          hostPath:
+            path: /sys/kernel/btf
+            type: DirectoryOrCreate
+        - name: dev-fs
+          hostPath:
+            path: /dev
+            type: Directory
+        - name: etc-fs
+          hostPath:
+            path: /etc
+
+
+
+
+
+
+
