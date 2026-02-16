@@ -1,0 +1,38 @@
+name: multi-container-app
+
+services:
+  local_nginx:
+    image: nginx:latest
+#    ports: # Comment to avoid port conflict with scale local_nginx
+#      - "8080:80"
+    volumes:
+      - ./index.html:/usr/share/nginx/html/index.html
+      - web-data:/usr/share/nginx/html
+    networks:
+      - appnet
+    depends_on:
+      - local_postgres_lab
+      - local_redis
+  local_postgres_lab:
+    image: postgres:latest
+    ports:
+      - "5433:5432"
+    env_file:
+      - .env
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - appnet
+  local_redis:
+    image: redis:latest
+    ports:
+      - "6380:6380"
+    networks:
+      - appnet
+
+volumes:
+  web-data:
+  db-data:
+networks:
+  appnet:
+    driver: bridge
